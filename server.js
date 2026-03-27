@@ -2,58 +2,51 @@ const express = require("express");
 const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
-const { Low } = require("lowdb");
-const { JSONFile } = require("lowdb/node");
+const low = require("lowdb");
+const FileSync = require("lowdb/adapters/FileSync");
 
 app.use(express.json());
 app.use(express.static(__dirname));
 
-const adapter = new JSONFile("db.json");
-const db = new Low(adapter, { users: [], messages: [], dms: [] });
+const adapter = new FileSync("db.json");
+const db = low(adapter);
+db.defaults({ users: [], messages: [], dms: [] }).write();
 
 let onlineUsers = {};
 
-async function initDB() {
-  await db.read();
-  await db.write();
-}
-initDB();
-
 // ================= REGISTER =================
-app.post("/register", async (req, res) => {
+app.post("/register", (req, res) => {
   const { username, password } = req.body;
-  await db.read();
 
-  if (db.data.users.find(u => u.username === username)) {
+  const exists = db.get("users").find({ username }).value();
+  if (exists) {
     return res.json({ success: false, message: "Ce pseudo est déjà pris" });
   }
 
-  const hash = await bcrypt.hash(password, 10);
-  db.data.users.push({ username, password: hash });
-  await db.write();
+  const hash = bcrypt.hashSync(password, 10);
+  db.get("users").push({ username, password: hash }).write();
   res.json({ success: true, message: "Compte créé !" });
 });
 
 // ================= LOGIN =================
-app.post("/login", async (req, res) => {
+app.post("/login", (req, res) => {
   const { username, password } = req.body;
-  await db.read();
 
-  const user = db.data.users.find(u => u.username === username);
+  const user = db.get("users").find({ username }).value();
   if (!user) return res.json({ success: false, message: "Utilisateur introuvable" });
 
-  const valid = await bcrypt.compare(password, user.password);
+  const valid = bcrypt.compareSync(password, user.password);
   if (!valid) return res.json({ success: false, message: "Mot de passe incorrect" });
 
   res.json({ success: true });
 });
 
 // ================= USERS ENDPOINT =================
-app.get("/users", async (req, res) => {
-  await db.read();
-  res.json(db.data.users.map(u => u.username));
+app.get("/users", (req, res) => {
+  const users = db.get("users").map("username").value();
+  res.json(users);
 });
 
 // ================= SOCKET =================
@@ -98,34 +91,30 @@ io.on("connection", (socket) => {
   });
 
   // ================= CHAT GLOBAL =================
-  socket.on("chat message", async (msg) => {
-    await db.read();
+  socket.on("chat message", (msg) => {
     const message = {
       user: msg.user,
       text: msg.text,
       time: new Date().toISOString()
     };
-    db.data.messages.push(message);
-    await db.write();
+    db.get("messages").push(message).write();
     io.emit("chat message", message);
   });
 
-  socket.on("load messages", async () => {
-    await db.read();
-    socket.emit("load messages", db.data.messages);
+  socket.on("load messages", () => {
+    const messages = db.get("messages").value();
+    socket.emit("load messages", messages);
   });
 
   // ================= DM PRIVÉ =================
-  socket.on("private message", async (data) => {
-    await db.read();
+  socket.on("private message", (data) => {
     const dm = {
       from: data.from,
       to: data.to,
       text: data.text,
       time: new Date().toISOString()
     };
-    db.data.dms.push(dm);
-    await db.write();
+    db.get("dms").push(dm).write();
 
     const targetSocket = onlineUsers[data.to];
     if (targetSocket) {
@@ -134,9 +123,10 @@ io.on("connection", (socket) => {
     socket.emit("private message", dm);
   });
 
-  socket.on("load dms", async (user) => {
-    await db.read();
-    const dms = db.data.dms.filter(dm => dm.from === user || dm.to === user);
+  socket.on("load dms", (user) => {
+    const dms = db.get("dms")
+      .filter(dm => dm.from === user || dm.to === user)
+      .value();
     socket.emit("load dms", dms);
   });
 
