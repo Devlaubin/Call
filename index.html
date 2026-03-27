@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+        }
+
+        /* LAYOUT PRINCIPAL */
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* CHAT PRINCIPAL */
+        .chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* BARRE MESSAGES */
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        /* BULLES DE MESSAGES */
+        .message {
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 60%;
+            word-wrap: break-word;
+        }
+
+        .me {
+            background: #2563eb;
+            align-self: flex-end;
+        }
+
+        .other {
+            background: #1e293b;
+            align-self: flex-start;
+        }
+
+        /* INPUT */
+        .inputBox {
+            display: flex;
+            padding: 10px;
+            background: #020617;
+        }
+
+        .inputBox input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+            border-radius: 5px;
+        }
+
+        .inputBox button {
+            padding: 10px;
+            background: #2563eb;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 5px;
+        }
+
+        /* SIDEBAR UTILISATEURS (DROITE) */
+        .sidebar {
+            width: 220px;
+            background: #020617;
+            padding: 10px;
+            border-left: 1px solid #1e293b;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar input {
+            padding: 5px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 10px;
+        }
+
+        .user {
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .user:hover {
+            background: #1e293b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOGIN -->
+    <div id="login" style="padding:10px;">
+        <h2>Login</h2>
+        <input id="username" placeholder="Pseudo">
+        <input id="password" type="password" placeholder="Mot de passe">
+        <button onclick="register()">Register</button>
+        <button onclick="loginUser()">Login</button>
+    </div>
+
+    <!-- APP -->
+    <div id="app" style="display:none;">
+        <div class="container">
+
+            <!-- CHAT -->
+            <div class="chat">
+                <div style="padding:10px; border-bottom:1px solid #1e293b;">
+                    💬 <span id="chatWith">Global</span>
+                </div>
+
+                <div id="messages" class="messages"></div>
+
+                <div class="inputBox">
+                    <input id="input" placeholder="Message...">
+                    <button onclick="send()">Envoyer</button>
+                </div>
+            </div>
+
+            <!-- SIDEBAR DROITE -->
+            <div class="sidebar">
+                <input id="searchUser" placeholder="Rechercher..." oninput="filterUsers()">
+                <div id="users"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let user = "";
+        let currentChat = "global";
+        let allUsers = [];
+
+        // ================= LOGIN =================
+        async function register() {
+            await fetch("/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: username.value, password: password.value })
+            });
+            alert("Compte créé");
+        }
+
+        async function loginUser() {
+            const res = await fetch("/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: username.value, password: password.value })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                user = username.value;
+                login.style.display = "none";
+                app.style.display = "block";
+
+                socket.emit("join", user);
+                socket.emit("load messages");
+                socket.emit("load dms", user);
+            } else {
+                alert(data.message);
+            }
+        }
+
+        // ================= USERS =================
+        socket.on("users", (users) => {
+            // toujours exclure l'utilisateur courant
+            allUsers = users.filter(u => u !== user);
+            renderUsers(allUsers);
+        });
+
+        function renderUsers(usersList) {
+            const div = document.getElementById("users");
+            div.innerHTML = "";
+
+            // GLOBAL
+            const globalBtn = document.createElement("div");
+            globalBtn.textContent = "🌍 Global";
+            globalBtn.className = "user";
+            globalBtn.onclick = () => {
+                currentChat = "global";
+                chatWith.textContent = "Global";
+                messages.innerHTML = "";
+                socket.emit("load messages");
+            };
+            div.appendChild(globalBtn);
+
+            // utilisateurs filtrés
+            usersList.forEach(u => {
+                const el = document.createElement("div");
+                el.textContent = "💬 " + u;
+                el.className = "user";
+
+                el.onclick = () => {
+                    currentChat = u;
+                    chatWith.textContent = u;
+                    messages.innerHTML = "";
+                    socket.emit("load dms", user);
+                };
+
+                div.appendChild(el);
+            });
+        }
+
+        function filterUsers() {
+            const search = document.getElementById("searchUser").value.toLowerCase();
+            const filtered = allUsers.filter(u => u.toLowerCase().includes(search));
+            renderUsers(filtered);
+        }
+
+        // ================= SEND =================
+        function send() {
+            const text = input.value;
+            if (!text) return;
+
+            if (currentChat === "global") {
+                socket.emit("chat message", { user, text });
+            } else {
+                socket.emit("private message", { from: user, to: currentChat, text });
+            }
+
+            input.value = "";
+        }
+
+        // ================= DISPLAY =================
+        function addMessage(msg) {
+            const div = document.createElement("div");
+            div.className = "message " + ((msg.user === user || msg.from === user) ? "me" : "other");
+            div.textContent = msg.text;
+            messages.appendChild(div);
+        }
+
+        // GLOBAL
+        socket.on("chat message", (msg) => {
+            if (currentChat === "global") addMessage(msg);
+        });
+
+        socket.on("load messages", msgs => {
+            if (currentChat === "global") msgs.forEach(addMessage);
+        });
+
+        // DM
+        socket.on("private message", (dm) => {
+            if (currentChat !== "global" &&
+                ((dm.from === user && dm.to === currentChat) || (dm.from === currentChat && dm.to === user))) {
+                addMessage(dm);
+            }
+        });
+
+        socket.on("load dms", (dms) => {
+            if (currentChat !== "global") {
+                dms.forEach(dm => {
+                    if ((dm.from === user && dm.to === currentChat) || (dm.from === currentChat && dm.to === user)) {
+                        addMessage(dm);
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

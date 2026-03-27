@@ -1,0 +1,14 @@
+{
+  "users": [
+    {
+      "username": "aubin",
+      "password": "$2b$10$csyUJoqnQSD/fonwmLBWze5E/CFNsa32C7DYEsUT/eYxsjfLG7F/2"
+    },
+    {
+      "username": "aze",
+      "password": "$2b$10$pTwaZZ1WqqlOfZ121GOpnu.IOb4.s5WorJtOoRfqLK3n./rRvKkee"
+    }
+  ],
+  "messages": [],
+  "dms": []
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        input,
+        button {
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Login / Register</h2>
+    <input id="username" placeholder="Pseudo"><br>
+    <input id="password" type="password" placeholder="Mot de passe"><br>
+    <button onclick="register()">Register</button>
+    <button onclick="loginUser()">Login</button>
+
+    <script>
+        async function register() {
+            const res = await fetch("/register", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: username.value, password: password.value })
+            });
+            alert((await res.json()).message);
+        }
+
+        async function loginUser() {
+            const res = await fetch("/login", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: username.value, password: password.value })
+            });
+            const data = await res.json();
+            if (data.success) {
+                localStorage.setItem("user", username.value);
+                window.location.href = "chat.html";
+            } else alert(data.message);
+        }
+    </script>
+</body>
+
+</html>
