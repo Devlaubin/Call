@@ -1,52 +1,342 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus — Connexion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet">
     <style>
-        body {
-            font-family: Arial;
-            background: #0f172a;
-            color: white;
-            text-align: center;
-            padding-top: 50px;
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        input,
-        button {
-            margin: 5px;
-            padding: 5px;
+        :root {
+            --bg: #08090d;
+            --surface: rgba(255, 255, 255, 0.04);
+            --surface-hover: rgba(255, 255, 255, 0.07);
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #6366f1;
+            --accent2: #a855f7;
+            --text: #f0f0f5;
+            --muted: #6b6b80;
+            --error: #f87171;
+            --success: #34d399;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: black;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        
+        .card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 48px 40px;
+            background: rgba(12, 13, 20, 0.85);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            background-color: White;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 36px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--surface);
+            border-radius: 52px;
+            padding: 4px;
+            margin-bottom: 28px;
+        }
+        .tabs:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 9px;
+            text-align: center;
+            border-radius: 90px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--muted);
+            border: none;
+            background: transparent;
+        }
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .tab.active {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.06);
+            color: white;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.06);
+        }
+
+        input::placeholder {
+            color: var(--muted);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+            letter-spacing: 0.02em;
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.06);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0);
+            transition: background 0.2s;
+        }
+
+        .btn:hover::after {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.error {
+            background: rgba(248, 113, 113, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            color: var(--error);
+        }
+
+        .toast.success {
+            background: rgba(52, 211, 153, 0.15);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            color: var(--success);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
 
 <body>
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
 
-    <h2>Login / Register</h2>
-    <input id="username" placeholder="Pseudo"><br>
-    <input id="password" type="password" placeholder="Mot de passe"><br>
-    <button onclick="register()">Register</button>
-    <button onclick="loginUser()">Login</button>
+    <div class="card">
+        <div class="logo">CALL</div>
+        <div class="subtitle">Messagerie temps réel</div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="setTab('login')">Connexion</button>
+            <button class="tab" onclick="setTab('register')">Inscription</button>
+        </div>
+
+        <div class="field">
+            <label>Pseudo</label>
+            <input id="username" placeholder="votre_pseudo" autocomplete="username" autofocus>
+        </div>
+        <div class="field">
+            <label>Mot de passe</label>
+            <input id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <button class="btn" id="submitBtn" onclick="submit()">Se connecter</button>
+    </div>
+
+    <div class="toast" id="toast"></div>
 
     <script>
-        async function register() {
-            const res = await fetch("/register", {
-                method: "POST", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username: username.value, password: password.value })
+        let mode = 'login';
+
+        function setTab(tab) {
+            mode = tab;
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
             });
-            alert((await res.json()).message);
+            document.getElementById('submitBtn').textContent = tab === 'login' ? 'Se connecter' : "S'inscrire";
         }
 
-        async function loginUser() {
-            const res = await fetch("/login", {
-                method: "POST", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username: username.value, password: password.value })
-            });
-            const data = await res.json();
-            if (data.success) {
-                localStorage.setItem("user", username.value);
-                window.location.href = "chat.html";
-            } else alert(data.message);
+        function showToast(msg, type = 'error') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `toast ${type} show`;
+            setTimeout(() => t.classList.remove('show'), 3000);
         }
+
+        function setLoading(loading) {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = loading;
+            btn.innerHTML = loading
+                ? '<span class="spinner"></span>' + (mode === 'login' ? 'Connexion...' : 'Inscription...')
+                : (mode === 'login' ? 'Se connecter' : "S'inscrire");
+        }
+
+        async function submit() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            if (!username || !password) return showToast('Remplis tous les champs');
+
+            setLoading(true);
+            try {
+                const endpoint = mode === 'login' ? '/login' : '/register';
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    if (mode === 'register') {
+                        showToast('Compte créé ! Tu peux te connecter.', 'success');
+                        setTab('login');
+                    } else {
+                        localStorage.setItem('user', username);
+                        showToast('Connexion réussie !', 'success');
+                        setTimeout(() => window.location.href = 'chat.html', 500);
+                    }
+                } else {
+                    showToast(data.message || 'Erreur');
+                }
+            } catch {
+                showToast('Erreur serveur');
+            }
+            setLoading(false);
+        }
+
+        document.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
     </script>
 </body>
 

@@ -105,41 +105,8 @@
 
 <body>
 
-    <!-- LOGIN -->
-    <div id="login" style="padding:10px;">
-        <h2>Login</h2>
-        <input id="username" placeholder="Pseudo">
-        <input id="password" type="password" placeholder="Mot de passe">
-        <button onclick="register()">Register</button>
-        <button onclick="loginUser()">Login</button>
-    </div>
+<button onclick="RedirectionJavascript()">Redirection...</button>
 
-    <!-- APP -->
-    <div id="app" style="display:none;">
-        <div class="container">
-
-            <!-- CHAT -->
-            <div class="chat">
-                <div style="padding:10px; border-bottom:1px solid #1e293b;">
-                    💬 <span id="chatWith">Global</span>
-                </div>
-
-                <div id="messages" class="messages"></div>
-
-                <div class="inputBox">
-                    <input id="input" placeholder="Message...">
-                    <button onclick="send()">Envoyer</button>
-                </div>
-            </div>
-
-            <!-- SIDEBAR DROITE -->
-            <div class="sidebar">
-                <input id="searchUser" placeholder="Rechercher..." oninput="filterUsers()">
-                <div id="users"></div>
-            </div>
-
-        </div>
-    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -179,6 +146,10 @@
                 alert(data.message);
             }
         }
+        
+        function RedirectionJavascript() {
+                document.location.href = "/chat.html";
+            }
 
         // ================= USERS =================
         socket.on("users", (users) => {
@@ -274,6 +245,7 @@
                 });
             }
         });
+        
     </script>
 
 </body>
