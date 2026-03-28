@@ -1,253 +1,273 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call — Messagerie</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet">
     <style>
-        body {
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
             margin: 0;
-            font-family: Arial;
-            background: #0f172a;
-            color: white;
+            padding: 0;
         }
 
-        /* LAYOUT PRINCIPAL */
-        .container {
-            display: flex;
-            height: 100vh;
+        :root {
+            --bg: #08090d;
+            --surface: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #6366f1;
+            --accent2: #a855f7;
+            --text: #f0f0f5;
+            --muted: #6b6b80;
         }
 
-        /* CHAT PRINCIPAL */
-        .chat {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* BARRE MESSAGES */
-        .messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        /* BULLES DE MESSAGES */
-        .message {
-            margin: 5px 0;
-            padding: 8px 12px;
-            border-radius: 15px;
-            max-width: 60%;
-            word-wrap: break-word;
-        }
-
-        .me {
-            background: #2563eb;
-            align-self: flex-end;
-        }
-
-        .other {
-            background: #1e293b;
-            align-self: flex-start;
-        }
-
-        /* INPUT */
-        .inputBox {
-            display: flex;
-            padding: 10px;
-            background: #020617;
-        }
-
-        .inputBox input {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            outline: none;
-            border-radius: 5px;
-        }
-
-        .inputBox button {
-            padding: 10px;
-            background: #2563eb;
-            border: none;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-left: 5px;
-        }
-
-        /* SIDEBAR UTILISATEURS (DROITE) */
-        .sidebar {
-            width: 220px;
-            background: #020617;
-            padding: 10px;
-            border-left: 1px solid #1e293b;
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
 
-        .sidebar input {
-            padding: 5px;
-            border-radius: 5px;
-            border: none;
-            margin-bottom: 10px;
+        /* Orbs */
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        .user {
-            padding: 8px;
-            border-radius: 6px;
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.18;
+            animation: drift 12s ease-in-out infinite alternate;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent);
+            top: -150px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent2);
+            bottom: -100px;
+            right: -80px;
+            animation-delay: -4s;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: #06b6d4;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -8s;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(30px, 20px) scale(1.05);
+            }
+        }
+
+        /* Main content */
+        .content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
+            animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(28px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 52px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+
+        .tagline {
+            font-size: 17px;
+            color: var(--muted);
+            max-width: 340px;
+            line-height: 1.6;
+            margin-bottom: 48px;
+        }
+
+        .features {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .feature-pill {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            font-size: 13px;
+            color: var(--muted);
+            animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .feature-pill:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .feature-pill:nth-child(2) {
+            animation-delay: 0.18s;
+        }
+
+        .feature-pill:nth-child(3) {
+            animation-delay: 0.26s;
+        }
+
+        .feature-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.01em;
         }
 
-        .user:hover {
-            background: #1e293b;
+        .btn-primary {
+            background: white;
+            color: #08090d;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.88;
+            transform: scale(1.1);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface);
+            color: var(--text);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        /* Bottom hint */
+        .hint {
+            position: fixed;
+            bottom: 28px;
+            font-size: 12px;
+            color: var(--muted);
+            opacity: 0.5;
+            z-index: 1;
         }
     </style>
 </head>
 
 <body>
 
-<button onclick="RedirectionJavascript()">Redirection...</button>
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="content">
+        <div class="logo">CALL</div>
+        <p class="tagline">Messagerie temps réel, simple et rapide. Chatte avec tes amis en un instant.</p>
 
 
-    <script src="/socket.io/socket.io.js"></script>
+        <div class="cta-group">
+            <a href="login.html?tab=register" class="btn btn-primary">Commencer</a>
+            <a href="chat.html" class="btn btn-secondary">J'ai déja un compte</a>
+        </div>
+    </div>
+
+    <div class="hint">Aucune installation requise</div>
+
     <script>
-        const socket = io();
-        let user = "";
-        let currentChat = "global";
-        let allUsers = [];
+        // If already logged in, redirect to chat
+        if (localStorage.getItem('user')) window.location.href = 'chat.html';
 
-        // ================= LOGIN =================
-        async function register() {
-            await fetch("/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username: username.value, password: password.value })
-            });
-            alert("Compte créé");
+        // Handle register tab param
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('tab') === 'register') {
+            window.location.href = 'login.html#register';
         }
-
-        async function loginUser() {
-            const res = await fetch("/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username: username.value, password: password.value })
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-                user = username.value;
-                login.style.display = "none";
-                app.style.display = "block";
-
-                socket.emit("join", user);
-                socket.emit("load messages");
-                socket.emit("load dms", user);
-            } else {
-                alert(data.message);
-            }
-        }
-        
-        function RedirectionJavascript() {
-                document.location.href = "/chat.html";
-            }
-
-        // ================= USERS =================
-        socket.on("users", (users) => {
-            // toujours exclure l'utilisateur courant
-            allUsers = users.filter(u => u !== user);
-            renderUsers(allUsers);
-        });
-
-        function renderUsers(usersList) {
-            const div = document.getElementById("users");
-            div.innerHTML = "";
-
-            // GLOBAL
-            const globalBtn = document.createElement("div");
-            globalBtn.textContent = "🌍 Global";
-            globalBtn.className = "user";
-            globalBtn.onclick = () => {
-                currentChat = "global";
-                chatWith.textContent = "Global";
-                messages.innerHTML = "";
-                socket.emit("load messages");
-            };
-            div.appendChild(globalBtn);
-
-            // utilisateurs filtrés
-            usersList.forEach(u => {
-                const el = document.createElement("div");
-                el.textContent = "💬 " + u;
-                el.className = "user";
-
-                el.onclick = () => {
-                    currentChat = u;
-                    chatWith.textContent = u;
-                    messages.innerHTML = "";
-                    socket.emit("load dms", user);
-                };
-
-                div.appendChild(el);
-            });
-        }
-
-        function filterUsers() {
-            const search = document.getElementById("searchUser").value.toLowerCase();
-            const filtered = allUsers.filter(u => u.toLowerCase().includes(search));
-            renderUsers(filtered);
-        }
-
-        // ================= SEND =================
-        function send() {
-            const text = input.value;
-            if (!text) return;
-
-            if (currentChat === "global") {
-                socket.emit("chat message", { user, text });
-            } else {
-                socket.emit("private message", { from: user, to: currentChat, text });
-            }
-
-            input.value = "";
-        }
-
-        // ================= DISPLAY =================
-        function addMessage(msg) {
-            const div = document.createElement("div");
-            div.className = "message " + ((msg.user === user || msg.from === user) ? "me" : "other");
-            div.textContent = msg.text;
-            messages.appendChild(div);
-        }
-
-        // GLOBAL
-        socket.on("chat message", (msg) => {
-            if (currentChat === "global") addMessage(msg);
-        });
-
-        socket.on("load messages", msgs => {
-            if (currentChat === "global") msgs.forEach(addMessage);
-        });
-
-        // DM
-        socket.on("private message", (dm) => {
-            if (currentChat !== "global" &&
-                ((dm.from === user && dm.to === currentChat) || (dm.from === currentChat && dm.to === user))) {
-                addMessage(dm);
-            }
-        });
-
-        socket.on("load dms", (dms) => {
-            if (currentChat !== "global") {
-                dms.forEach(dm => {
-                    if ((dm.from === user && dm.to === currentChat) || (dm.from === currentChat && dm.to === user)) {
-                        addMessage(dm);
-                    }
-                });
-            }
-        });
-        
     </script>
-
 </body>
 
 </html>
