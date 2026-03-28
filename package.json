@@ -1,7 +1,7 @@
 {
-  "name": "nexus-chat",
+  "name": "Call-chat",
   "version": "2.0.0",
-  "description": "Real-time chat app — Nexus",
+  "description": "Real-time chat app — Call",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

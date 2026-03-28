@@ -1,5 +1,33 @@
 {
-  "users": [],
+  "users": [
+    {
+      "username": "Paul",
+      "password": "$2a$10$/clj472OSxq8KrsFvg9zWuFcmY6aJgSqzjxn6HUfMglgnloQBfs3e"
+    },
+    {
+      "username": "Aubin",
+      "password": "$2a$10$of54sbEG3Uh22t8ict/ia.sNltdTVdfTqWbNyHJDVeGp8/tZKb9JK"
+    }
+  ],
   "messages": [],
-  "dms": []
+  "dms": [
+    {
+      "from": "aubinz",
+      "to": "Paul",
+      "text": "Salut",
+      "time": "2026-03-28T10:08:35.920Z"
+    },
+    {
+      "from": "Aubin",
+      "to": "Paul",
+      "text": "Samut",
+      "time": "2026-03-28T10:09:09.041Z"
+    },
+    {
+      "from": "Paul",
+      "to": "Aubin",
+      "text": "salut, ca va ?",
+      "time": "2026-03-28T10:09:26.436Z"
+    }
+  ]
 }
